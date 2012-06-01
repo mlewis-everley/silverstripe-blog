@@ -24,6 +24,12 @@ class BlogEntry extends Page {
 	static $many_many = array();
 	
 	static $belongs_many_many = array();
+        
+        static $summary_fields = array(
+            'Title' => 'Title',
+            'Date'  => 'Posted Date',
+            'Parent.Title'  => 'Posted to?'
+        );
 	
 	static $defaults = array(
 		"ProvideComments" => true,
@@ -54,6 +60,7 @@ class BlogEntry extends Page {
 		Requirements::themedCSS('bbcodehelp');
 		
 		$firstName = Member::currentUser() ? Member::currentUser()->FirstName : '';
+                
 		$codeparser = new BBCodeParser();
 		
 		SiteTree::disableCMSFieldsExtensions();
@@ -65,7 +72,11 @@ class BlogEntry extends Page {
 			$fields->addFieldToTab("Root.Main", new TextareaField("Content", _t("BlogEntry.CN", "Content"), 20));
 		}
 		
+                $blogs = DataList::create('BlogHolder');
+                $fields->addFieldToTab('Root.Main', new DropdownField('ParentID', 'Post to...', $blogs->map("ID", "Title", "Please Select")), 'Content');
+                
 		$fields->addFieldToTab("Root.Main", $dateField = new DatetimeField("Date", _t("BlogEntry.DT", "Date")),"Content");
+                
 		$dateField->getDateField()->setConfig('showcalendar', true);
 		$dateField->getTimeField()->setConfig('showdropdown', true);
 		$fields->addFieldToTab("Root.Main", new TextField("Author", _t("BlogEntry.AU", "Author"), $firstName),"Content");
@@ -77,11 +88,21 @@ class BlogEntry extends Page {
 		}
 				
 		$fields->addFieldToTab("Root.Main", new TextField("Tags", _t("BlogEntry.TS", "Tags (comma sep.)")),"Content");
-		
+                
 		$this->extend('updateCMSFields', $fields);
 		
 		return $fields;
 	}
+        
+        function getCMSActions() {
+            $actions = parent::getCMSActions();
+            
+            $publishAction = FormAction::create('doPublish','Publish');
+            
+            $actions->add($publishAction);
+            
+            return $actions;
+        }
 	
 	/**
 	 * Returns the tags added to this blog entry
