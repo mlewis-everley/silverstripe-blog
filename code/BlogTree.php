@@ -214,7 +214,7 @@ class BlogTree extends Page {
         // Ensure only current posts are shown
         if(!$this->ShowFuture) {
             $filter .= ($filter) ? " AND " : "";
-            $filter .= "\"BlogEntry\".\"Date\" < '{$cur_date->toString('YYYY-MM-dd')}'";
+            $filter .= "\"BlogEntry\".\"Date\" < '{$cur_date->toString('YYYY-MM-dd HH:mm:ss')}'";
         }
 
         $order = '"BlogEntry"."Date" DESC';
