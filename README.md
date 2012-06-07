@@ -9,6 +9,10 @@ The blog module allows you to post blogs on your SilverStripe. It includes the a
  * Saophalkun Ponlu (phalkunz at silverstripe dot com)
  * Carlos Barberis (carlos at silverstripe dot com)
 
+ ## Requirements
+
+ * Silverstripe 3.0
+
 ## Feature Overview
 
 *  Front-end blog post form

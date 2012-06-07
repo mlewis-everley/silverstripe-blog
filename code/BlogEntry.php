@@ -88,7 +88,7 @@ class BlogEntry extends Page {
 		}
 				
 		$fields->addFieldToTab("Root.Main", new TextField("Tags", _t("BlogEntry.TS", "Tags (comma sep.)")),"Content");
-                
+
 		$this->extend('updateCMSFields', $fields);
 		
 		return $fields;
@@ -112,7 +112,6 @@ class BlogEntry extends Page {
 		$output = new ArrayList();
 		
 		$link = $this->getParent() ? $this->getParent()->Link('tag') : '';
-		
 		foreach($tags as $tag) {
 			$output->push(new ArrayData(array(
 				'Tag' => $tag,
