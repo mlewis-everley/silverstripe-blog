@@ -26,9 +26,9 @@ class BlogTree extends Page {
                 'ShowFuture' => false
 	);
 	
-	static $has_one = array(
-		"SideBar" => "WidgetArea",
-	);
+	static $has_one = array();
+
+	static $has_many = array();
 	
 	static $allowed_children = array(
 		'BlogTree', 'BlogHolder'
@@ -98,8 +98,9 @@ class BlogTree extends Page {
 	
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
+                
 		$fields->addFieldToTab("Root.Behaviour", new TextField("Name", "Name of blog"));
-		$fields->addFieldToTab('Root.Behaviour', new DropdownField('LandingPageFreshness', 'When you first open the blog, how many entries should I show', array( 
+		$fields->addFieldToTab('Root.Behaviour', new DropdownField('LandingPageFreshness', 'When you first open the blog, how many entries should I show', array(
  			"" => "All entries", 
 			"1 MONTH" => "Last month's entries", 
 			"2 MONTH" => "Last 2 months' entries", 
@@ -115,10 +116,13 @@ class BlogTree extends Page {
 			"12 MONTH" => "Last year's entries", 
 			"INHERIT" => "Take value from parent Blog Tree"
 		))); 
+                
                 $fields->addFieldToTab('Root.Behaviour', new CheckboxField('ShowFuture', 'Show posts dated in the future?'));
- 	
-		$fields->addFieldToTab("Root.Content.Widgets", new CheckboxField("InheritSideBar", 'Inherit Sidebar From Parent'));
-		$fields->addFieldToTab("Root.Content.Widgets", new WidgetAreaEditor("SideBar"));
+
+ 		if(class_exists('WidgetArea')) {
+ 			$fields->addFieldToTab("Root.Widgets", new CheckboxField("InheritSideBar", 'Inherit Sidebar From Parent'));
+			$fields->addFieldToTab("Root.Widgets", new WidgetAreaEditor("SideBar"));
+ 		}
 		
 		return $fields;
 	}

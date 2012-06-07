@@ -1,12 +1,12 @@
-Behaviour.register({
-	'#BBCodeHint': {
+(function($) {
+$.entwine('ss', function($){
+
+	$('#BBCodeHint').entwine({
 		onclick: function() {
-			if($('BBTagsHolder').style.display == "none") {
-				Effect.BlindDown('BBTagsHolder');
-			} else{
-				Effect.BlindUp('BBTagsHolder');
-			}
-			return false;
+			$('#BBTagsHolder').toggle();
 		}
-	}
+	});
+
 });
+}(jQuery));
+
