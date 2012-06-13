@@ -95,11 +95,20 @@ class BlogEntry extends Page {
 	}
         
         function getCMSActions() {
-            $actions = parent::getCMSActions();
+            $actions = new FieldList();
             
-            $publishAction = FormAction::create('doPublish','Publish');
+            $actions->push(FormAction::create('doSave', _t('GridFieldDetailForm.Save', 'Save'))
+                    ->setUseButtonTag(true)->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'));
             
-            $actions->add($publishAction);
+            $actions->push(FormAction::create('doPublish', _t('GridFieldDetailForm.Publish', 'Publish'))
+                    ->setUseButtonTag(true)->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'));
+            
+            // The delete action will redirect, hence pjax-content class.
+            $actions->push(FormAction::create('doUnPublish', _t('GridFieldDetailForm.UnPublish', 'UnPublish'))
+                    ->addExtraClass('ss-ui-action-destructive')->addExtraClass('pjax-content'));
+            
+            $actions->push(FormAction::create('doDelete', _t('GridFieldDetailForm.Delete', 'Delete'))
+                    ->addExtraClass('ss-ui-action-destructive')->addExtraClass('pjax-content'));
             
             return $actions;
         }
