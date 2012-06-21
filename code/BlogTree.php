@@ -159,7 +159,7 @@ class BlogTree extends Page {
      * @param string $where
      * @return DataObjectSet
      */
-    public function Entries($limit = '', $tag = '', $date = '', $retrieveCallback = null, $filter = '') {
+    public function Entries($tag = '', $date = '', $retrieveCallback = null, $filter = '', $limit = '') {
 
         $tagCheck = '';
         $dateCheck = '';
@@ -225,8 +225,17 @@ class BlogTree extends Page {
 
         // By specifying a callback, you can alter the SQL, or sort on something other than date.
         if($retrieveCallback) return call_user_func($retrieveCallback, 'BlogEntry', $filter, $limit, $order);
-
-        return DataObject::get('BlogEntry', $filter, $order, '', $limit);
+        
+        $list =  DataList::create('BlogEntry')->where($filter)->sort($order);
+        
+        if($limit) {
+            $limit = explode(',',$limit);
+            $list->limit($limit[1],$limit[0]);
+        }
+        
+        return $list;
+        
+        //return DataObject::get('BlogEntry', $filter, $order, '', $limit);
     }
 }
 
@@ -248,9 +257,6 @@ class BlogTree_Controller extends Page_Controller {
     }
 
     function BlogEntries($limit = null) {
-
-        if($limit === null) $limit = BlogTree::$default_entries_limit;
-
         // Set an empty filter
         $filter = '';
 
@@ -284,7 +290,17 @@ class BlogTree_Controller extends Page_Controller {
 
         $date = $this->SelectedDate();
 
-        return $this->Entries("$start,$limit", $this->SelectedTag(), ($date) ? $date : '', null, $filter);
+        $list = new PaginatedList($this->Entries($this->SelectedTag(), ($date) ? $date : '', null, $filter),$this->request);
+        if($limit === null)
+            $list->setPageLength(BlogTree::$default_entries_limit);
+        else
+            $list->setPageLength($limit);
+        
+        // Shouldn't really have to do this. For some reasin the list doesn't
+        // seem to know it has multiple pages without.
+        $list->getTotalItems();
+        
+        return $list;
     }
 
     /**
