@@ -33,9 +33,8 @@ class BlogManagementWidget extends Widget implements PermissionProvider {
 	}
 
 	function CommentLink() {
-		if(!Permission::check('BLOGMANAGEMENT') || !class_exists('Comment')) {
-			return false;
-		}
+		if(!Permission::check('BLOGMANAGEMENT') || !class_exists('Comment')) return false;
+
 		$unmoderatedcount = DB::query("SELECT COUNT(*) FROM \"PageComment\" WHERE \"NeedsModeration\"=1")->value();
 
 		if($unmoderatedcount > 0) {

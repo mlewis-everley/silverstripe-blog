@@ -24,6 +24,12 @@ class BlogEntry extends Page {
 	static $many_many = array();
 	
 	static $belongs_many_many = array();
+        
+        static $summary_fields = array(
+            'Title' => 'Title',
+            'Date'  => 'Posted Date',
+            'Parent.Title'  => 'Posted to?'
+        );
 	
 	static $defaults = array(
 		"ProvideComments" => true,
@@ -57,6 +63,7 @@ class BlogEntry extends Page {
 		Requirements::themedCSS('bbcodehelp');
 		
 		$firstName = Member::currentUser() ? Member::currentUser()->FirstName : '';
+                
 		$codeparser = new BBCodeParser();
 		
 		SiteTree::disableCMSFieldsExtensions();
@@ -68,7 +75,11 @@ class BlogEntry extends Page {
 			$fields->addFieldToTab("Root.Main", new TextareaField("Content", _t("BlogEntry.CN", "Content"), 20));
 		}
 		
+                $blogs = DataList::create('BlogHolder');
+                $fields->addFieldToTab('Root.Main', new DropdownField('ParentID', 'Post to...', $blogs->map("ID", "Title", "Please Select")), 'Content');
+                
 		$fields->addFieldToTab("Root.Main", $dateField = new DatetimeField("Date", _t("BlogEntry.DT", "Date")),"Content");
+                
 		$dateField->getDateField()->setConfig('showcalendar', true);
 		$dateField->getTimeField()->setConfig('showdropdown', true);
 		$fields->addFieldToTab("Root.Main", new TextField("Author", _t("BlogEntry.AU", "Author"), $firstName),"Content");
@@ -80,11 +91,30 @@ class BlogEntry extends Page {
 		}
 				
 		$fields->addFieldToTab("Root.Main", new TextField("Tags", _t("BlogEntry.TS", "Tags (comma sep.)")),"Content");
-		
+
 		$this->extend('updateCMSFields', $fields);
 		
 		return $fields;
 	}
+        
+        function getCMSActions() {
+            $actions = new FieldList();
+            
+            $actions->push(FormAction::create('doSave', _t('GridFieldDetailForm.Save', 'Save'))
+                    ->setUseButtonTag(true)->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'));
+            
+            $actions->push(FormAction::create('doPublish', _t('GridFieldDetailForm.Publish', 'Publish'))
+                    ->setUseButtonTag(true)->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'));
+            
+            // The delete action will redirect, hence pjax-content class.
+            $actions->push(FormAction::create('doUnPublish', _t('GridFieldDetailForm.UnPublish', 'UnPublish'))
+                    ->addExtraClass('ss-ui-action-destructive')->addExtraClass('pjax-content'));
+            
+            $actions->push(FormAction::create('doDelete', _t('GridFieldDetailForm.Delete', 'Delete'))
+                    ->addExtraClass('ss-ui-action-destructive')->addExtraClass('pjax-content'));
+            
+            return $actions;
+        }
 	
 	/**
 	 * Returns the tags added to this blog entry

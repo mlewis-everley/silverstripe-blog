@@ -34,9 +34,9 @@ class BlogHolder extends BlogTree implements PermissionProvider {
 		$fields = parent::getCMSFields();
 		SiteTree::enableCMSFieldsExtensions();
 
-		$fields->addFieldToTab('Root.Main', new CheckboxField('TrackBacksEnabled', 'Enable TrackBacks'));
-		$fields->addFieldToTab('Root.Main', new DropdownField('OwnerID', 'Blog owner', array_merge(array('' => "(None)"), $blogOwners->map('ID', 'Name')->toArray())));
-		$fields->addFieldToTab('Root.Main', new CheckboxField('AllowCustomAuthors', 'Allow non-admins to have a custom author field'));
+		$fields->addFieldToTab('Root.Behaviour', new CheckboxField('TrackBacksEnabled', 'Enable TrackBacks'));
+		$fields->addFieldToTab('Root.Behaviour', new DropdownField('OwnerID', 'Blog owner', array_merge(array('' => "(None)"), $blogOwners->map('ID', 'Name')->toArray())));
+		$fields->addFieldToTab('Root.Behaviour', new CheckboxField('AllowCustomAuthors', 'Allow non-admins to have a custom author field'));
 
 		$this->extend('updateCMSFields', $fields);
 
@@ -238,6 +238,7 @@ class BlogHolder_Controller extends BlogTree_Controller {
 		);
 		
 		$submitAction = new FormAction('postblog', _t('BlogHolder.POST', 'Post blog entry'));
+
 		$actions = new FieldList($submitAction);
 		$validator = new RequiredFields('Title','BlogPost');
 
