@@ -1,4 +1,5 @@
 <?php 
+require_once('Zend/Date.php');
 
 /**
  * @package blog
@@ -17,10 +18,12 @@ class BlogTree extends Page {
 		'Name' => 'Varchar',
 		'InheritSideBar' => 'Boolean',
 		'LandingPageFreshness' => 'Varchar',
+		'ShowFuture' => 'Boolean'
 	);
 	
 	static $defaults = array(
-		'InheritSideBar' => True
+		'InheritSideBar' => True,
+		'ShowFuture' => False
 	);
 	
 	static $has_one = array();
@@ -113,6 +116,9 @@ class BlogTree extends Page {
 			"12" => "Last year's entries", 
 			"INHERIT" => "Take value from parent Blog Tree"
 		))); 
+		
+		$fields->addFieldToTab('Root.Main', new CheckboxField('ShowFuture', 'Show posts dated in the future?'));
+		
  		if(class_exists('WidgetArea')) {
  			$fields->addFieldToTab("Root.Widgets", new CheckboxField("InheritSideBar", 'Inherit Sidebar From Parent'));
 			$fields->addFieldToTab("Root.Widgets", new WidgetAreaEditor("SideBar"));
@@ -155,6 +161,9 @@ class BlogTree extends Page {
 	 * @return DataObjectSet
 	 */
 	public function Entries($limit = '', $tag = '', $date = '', $retrieveCallback = null, $filter = '') {
+		
+		// Get the current date
+		$cur_date = new Zend_Date(SS_Datetime::now()->getValue());
 		
 		$tagCheck = '';
 		$dateCheck = '';
@@ -206,6 +215,12 @@ class BlogTree extends Page {
 		// Otherwise, do the actual query
 		if($filter) $filter .= ' AND ';
 		$filter .= '"SiteTree"."ParentID" IN (' . implode(',', $holderIDs) . ") $tagCheck $dateCheck";
+
+		// Ensure only current posts are shown
+		if(!$this->ShowFuture) {
+			$filter .= ($filter) ? " AND " : "";
+			$filter .= "\"BlogEntry\".\"Date\" < '{$cur_date->toString('YYYY-MM-dd')}'";
+		}
 
 		$order = '"BlogEntry"."Date" DESC';
 
