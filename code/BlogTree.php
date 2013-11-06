@@ -161,7 +161,7 @@ class BlogTree extends Page {
         $dateCheck = '';
 
         // Get the current date
-        $cur_date = new Zend_Date(SS_Datetime::now()->getValue());
+        $datetime = new Datetime();
         
         if($tag) {
             $SQL_tag = Convert::raw2sql($tag);
@@ -214,7 +214,7 @@ class BlogTree extends Page {
         // Ensure only current posts are shown
         if(!$this->ShowFuture) {
             $filter .= ($filter) ? " AND " : "";
-            $filter .= "\"BlogEntry\".\"Date\" < '{$cur_date->toString('YYYY-MM-dd HH:mm:ss')}'";
+            $filter .= "\"BlogEntry\".\"Date\" < '{$datetime->format('Y-m-d H:i:s')}'";
         }
 
         $order = '"BlogEntry"."Date" DESC';
